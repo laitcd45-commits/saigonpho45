@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sài Gòn hôm nay ăn gì? — Cartoon Edition</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@600;700;800&display=swap');
+:root{
+  --cream:#fff6df;--paper:#fffdf6;--brown:#5a3827;--line:#70462f;
+  --red:#d85c50;--green:#79a96c;--gold:#f2c45c;--blue:#73aeb0;
+  --shadow:0 10px 25px rgba(74,43,26,.16)
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;overflow:hidden;font-family:"Nunito",sans-serif;color:var(--brown);background:#e7bd7b}
+button{font:inherit;cursor:pointer}
+#game{width:100vw;height:100vh;position:relative;overflow:hidden;background:linear-gradient(#a6d8df 0 48%,#d6a35e 48% 100%)}
+
+/* SAIGON BACKGROUND */
+.sky{position:absolute;inset:0 0 54% 0;background:linear-gradient(#99d1dc,#dcece5)}
+.cloud{position:absolute;background:#fff9e9;border-radius:50px;opacity:.82}
+.cloud:before,.cloud:after{content:"";position:absolute;background:inherit;border-radius:50%}
+.cloud.c1{width:145px;height:32px;left:7%;top:10%}.cloud.c1:before{width:55px;height:55px;left:25px;top:-22px}.cloud.c1:after{width:72px;height:62px;left:70px;top:-30px}
+.cloud.c2{width:125px;height:28px;right:12%;top:17%}.cloud.c2:before{width:52px;height:48px;left:15px;top:-20px}.cloud.c2:after{width:62px;height:52px;right:16px;top:-25px}
+.city{position:absolute;left:0;right:0;bottom:0;height:43%;background:linear-gradient(to top,#d89b54 0 9%,#91b97d 9% 13%,transparent 13%)}
+.building{position:absolute;bottom:12%;background:#e8b06a;border:4px solid #8b6045;border-bottom:0;border-radius:9px 9px 0 0}
+.b1{left:4%;width:11%;height:46%}.b2{left:17%;width:9%;height:64%;background:#e7d09a}.b3{left:28%;width:14%;height:51%;background:#efbd72}.b4{right:25%;width:12%;height:61%;background:#dfae76}.b5{right:10%;width:13%;height:45%;background:#efc888}
+.win{position:absolute;width:17px;height:23px;background:#76a9a9;border:3px solid #6b503c}
+.b1 .win{left:20%;top:18%;box-shadow:40px 0 #76a9a9,80px 0 #76a9a9,20px 48px #76a9a9,60px 48px #76a9a9}
+.b2 .win{left:18%;top:20%;box-shadow:30px 0 #76a9a9,60px 0 #76a9a9,0 45px #76a9a9,30px 45px #76a9a9}
+.b3 .win{left:18%;top:18%;box-shadow:35px 0 #76a9a9,70px 0 #76a9a9,35px 48px #76a9a9}
+.b4 .win{left:17%;top:16%;box-shadow:35px 0 #76a9a9,70px 0 #76a9a9,35px 50px #76a9a9}
+.b5 .win{left:18%;top:18%;box-shadow:36px 0 #76a9a9,72px 0 #76a9a9,36px 45px #76a9a9}
+.road{position:absolute;left:0;right:0;bottom:0;height:14%;background:#8c7567}.road:before{content:"";position:absolute;left:0;right:0;top:47%;height:8%;background:repeating-linear-gradient(90deg,#f9df91 0 65px,transparent 65px 120px)}
+.tree{position:absolute;bottom:10%;width:70px;height:110px}.tree:before{content:"";position:absolute;left:27px;bottom:0;width:18px;height:60px;background:#75553d}.tree:after{content:"";position:absolute;left:0;top:0;width:70px;height:70px;background:#6c9d6a;border:5px solid #547c55;border-radius:50%}.t1{left:1%}.t2{right:3%}
+
+/* SHOP */
+.shop{position:absolute;left:2.5%;right:2.5%;top:3%;bottom:3%;background:var(--cream);border:7px solid var(--line);border-radius:28px;box-shadow:0 18px 45px rgba(68,42,27,.28);overflow:hidden}
+.awning{position:absolute;top:0;left:0;right:0;height:78px;background:repeating-linear-gradient(90deg,#d85c50 0 68px,#fff0d0 68px 136px);border-bottom:5px solid var(--line)}
+.awning:after{content:"";position:absolute;left:0;right:0;bottom:-16px;height:20px;background:repeating-linear-gradient(90deg,#d85c50 0 68px,#fff0d0 68px 136px);clip-path:polygon(0 0,100% 0,96% 100%,88% 100%,84% 0,16% 0,12% 100%,4% 100%)}
+.sign{position:absolute;z-index:10;top:22px;left:50%;transform:translateX(-50%);background:#fff1c9;border:4px solid var(--line);border-radius:18px;padding:8px 30px;box-shadow:0 7px 0 #c78955;text-align:center;white-space:nowrap}
+.sign .title{font:800 25px "Baloo 2";color:#c84e42;line-height:1}.sign .sub{font-size:11px;font-weight:800;letter-spacing:2px;color:#76513b}
+.hud{position:absolute;z-index:20;top:92px;left:18px;right:18px;height:52px;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
+.pill{background:#fff8e7;border:3px solid #76513b;border-radius:18px;padding:6px 14px;box-shadow:0 4px 0 rgba(112,70,47,.18);font-weight:800;pointer-events:auto}
+.hudLeft,.hudRight{display:flex;gap:8px;align-items:center}.hudRight button{padding:8px 13px;border-radius:15px;background:#fff8e7;border:3px solid #76513b;color:var(--brown)}
+.play{position:absolute;top:150px;left:18px;right:18px;bottom:18px;display:grid;grid-template-columns:25% 47% 28%;gap:12px}
+.panel{position:relative;background:rgba(255,250,236,.91);border:4px solid #79513b;border-radius:24px;box-shadow:var(--shadow);overflow:hidden}
+.panelTitle{position:absolute;z-index:8;top:10px;left:50%;transform:translateX(-50%);background:#fff1c9;border:3px solid #79513b;border-radius:15px;padding:4px 15px;font:800 16px "Baloo 2";white-space:nowrap}
+
+/* CUSTOMER CHARACTER */
+.customer{background:linear-gradient(#fffaf0,#f7dfb0)}
+.customer .character{position:absolute;left:50%;bottom:7%;transform:translateX(-50%);width:78%;height:68%;z-index:2}
+.charBounce{animation:floaty 2.8s ease-in-out infinite}
+@keyframes floaty{0%,100%{margin-bottom:0}50%{margin-bottom:5px}}
+.orderCard{position:absolute;z-index:9;left:10px;right:10px;top:48px;background:#fffdf4;border:3px dashed #c98557;border-radius:15px;padding:7px 9px;box-shadow:0 5px 12px rgba(75,42,26,.12);font-size:11px}
+.orderCard b{display:block;color:#c84e42;margin-bottom:2px}.orderItems{line-height:1.25}
+.customerSeat{position:absolute;bottom:4%;left:15%;right:15%;height:12px;border-radius:50%;background:#bb8555;box-shadow:0 3px 0 #805337}
+
+/* COOK */
+.cook{background:linear-gradient(#fff9ea,#f9e3b4)}
+.kitchenBack{position:absolute;left:0;right:0;top:0;height:40%;background:linear-gradient(90deg,rgba(255,255,255,.55) 1px,transparent 1px) 0 0/42px 42px,linear-gradient(rgba(255,255,255,.55) 1px,transparent 1px) 0 0/42px 42px,#efc98c;border-bottom:5px solid #9b6a49}
+.shelf{position:absolute;top:17%;left:6%;right:6%;height:13px;background:#80523a;border-radius:8px;box-shadow:0 10px 0 #bd8556}
+.jar{position:absolute;top:10%;width:32px;height:38px;border:3px solid #77513d;border-radius:7px;background:#e89f75}.jar.j1{left:14%}.jar.j2{left:28%;background:#f1d16f}.jar.j3{right:27%;background:#8db9a4}.jar.j4{right:13%;background:#df8f82}
+.potZone{position:absolute;left:17%;right:17%;top:29%;height:45%;display:flex;align-items:center;justify-content:center}
+.pot{position:relative;width:185px;height:145px;background:linear-gradient(#7c7771,#45413f);border:7px solid #393634;border-radius:22px 22px 65px 65px;box-shadow:inset 0 10px 15px rgba(255,255,255,.12),0 12px 0 #725039;transition:.2s}
+.pot:before{content:"";position:absolute;left:-23px;right:-23px;top:-17px;height:28px;background:#4b4845;border:6px solid #393634;border-radius:50%}.pot:after{content:"";position:absolute;left:20px;right:20px;bottom:-22px;height:28px;border-radius:50%;background:#363331}
+.pot.hot{animation:potShake .25s infinite alternate}@keyframes potShake{to{transform:rotate(1deg) translateY(-2px)}}
+.foodInside{position:absolute;left:25px;right:25px;top:-2px;min-height:20px;display:flex;gap:4px;flex-wrap:wrap;justify-content:center;z-index:2}
+.foodDot{font-size:27px;filter:drop-shadow(0 2px 1px rgba(0,0,0,.2));animation:pop .25s ease}@keyframes pop{from{transform:scale(.4)}to{transform:scale(1)}}
+.steam{position:absolute;top:-70px;font-size:36px;opacity:0}.pot.cooking .steam{animation:steam 1.5s infinite}.s1{left:25px}.s2{left:72px;animation-delay:.4s}.s3{left:120px;animation-delay:.8s}
+@keyframes steam{0%{opacity:0;transform:translateY(15px) scale(.8)}40%{opacity:.8}100%{opacity:0;transform:translateY(-30px) scale(1.2)}}
+.cookButtons{position:absolute;left:8%;right:8%;bottom:10%;display:flex;gap:9px;justify-content:center}
+.mainBtn{min-width:130px;padding:11px 18px;border-radius:18px;border:4px solid var(--line);background:#e96858;color:#fff8e9;font:800 17px "Baloo 2";box-shadow:0 5px 0 #a94035;transition:.15s;position:relative;overflow:hidden}
+.mainBtn:hover{transform:translateY(-2px)}.mainBtn:active{transform:translateY(3px);box-shadow:0 2px 0 #a94035}.mainBtn.green{background:#79a96c;box-shadow:0 5px 0 #52794a}.mainBtn.blue{background:#68a5a9;box-shadow:0 5px 0 #47777b}.mainBtn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.progressWrap{position:absolute;left:15%;right:15%;bottom:6%;height:12px;background:#e8d4ad;border:2px solid #76513b;border-radius:10px;overflow:hidden;display:none}.progress{height:100%;width:0;background:#e46a56;transition:width .1s}
+.dropHint{position:absolute;z-index:3;left:50%;top:57%;transform:translate(-50%,-50%);background:rgba(255,249,225,.93);border:3px dashed #d28362;border-radius:18px;padding:9px 15px;font-weight:800;color:#a45643;pointer-events:none;transition:.2s}.cook.dragOver .dropHint{background:#ffe0a7;transform:translate(-50%,-50%) scale(1.05)}
+
+/* INGREDIENTS */
+.ingredients{background:#fff8e7}
+.ingredientGrid{position:absolute;left:10px;right:10px;top:50px;bottom:82px;display:grid;grid-template-columns:repeat(2,1fr);gap:9px;overflow:auto;padding:3px}
+.ingredient{position:relative;min-height:76px;background:#fff;border:3px solid #c89062;border-radius:17px;box-shadow:0 4px 0 #e0bd91;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform .12s,box-shadow .12s;user-select:none;touch-action:none}
+.ingredient:hover{transform:translateY(-3px) rotate(-1deg);box-shadow:0 7px 0 #e0bd91}.ingredient.dragging{opacity:.55;transform:scale(.9)}
+.ingredient .ico{font-size:30px;line-height:1}.ingredient span{font-size:12px;font-weight:800;margin-top:2px}
+.tip{position:absolute;bottom:12px;left:10px;right:10px;background:#f6dfae;border:2px dashed #a8754f;border-radius:13px;padding:7px;text-align:center;font-size:11px;font-weight:800}
+
+/* SERVING */
+.servingTray{position:absolute;z-index:40;left:50%;top:52%;width:180px;height:145px;transform:translate(-50%,-50%) scale(.5);opacity:0;pointer-events:none}
+.servingTray.show{animation:serveMove 1.5s cubic-bezier(.2,.8,.2,1) forwards}
+.servingTray .tray{position:absolute;left:5px;bottom:7px;width:170px;height:38px;background:#b97948;border:5px solid #70462f;border-radius:50%;box-shadow:0 7px 0 #8b5739}
+.servingTray .bowl{position:absolute;left:38px;bottom:28px;width:105px;height:76px;background:linear-gradient(#f8e9c9,#d6b681);border:5px solid #70462f;border-radius:15px 15px 48px 48px;box-shadow:inset 0 8px rgba(255,255,255,.45)}
+.servingTray .food{position:absolute;left:48px;bottom:72px;font-size:42px;letter-spacing:-10px;filter:drop-shadow(0 3px 2px rgba(0,0,0,.2))}
+@keyframes serveMove{
+  0%{left:56%;top:57%;transform:translate(-50%,-50%) scale(.45) rotate(-5deg);opacity:0}
+  18%{opacity:1}
+  48%{left:36%;top:52%;transform:translate(-50%,-50%) scale(.7) rotate(2deg)}
+  100%{left:14%;top:55%;transform:translate(-50%,-50%) scale(.48) rotate(-2deg);opacity:1}
+}
+.customerEating{animation:eatBob .32s infinite alternate!important}
+@keyframes eatBob{to{transform:translateX(-50%) translateY(4px) rotate(1deg)}}
+.eatBubble{position:absolute;z-index:30;left:62%;top:47%;background:#fffdf3;border:4px solid #70462f;border-radius:20px;padding:9px 13px;font:800 14px "Baloo 2";opacity:0;transform:scale(.6);pointer-events:none}
+.eatBubble.show{animation:bubblePop .8s forwards}
+@keyframes bubblePop{20%{opacity:1;transform:scale(1.05)}100%{opacity:1;transform:scale(1)}}
+
+/* TOAST */
+.toast{position:fixed;z-index:100;left:50%;top:50%;transform:translate(-50%,-50%) scale(.9);width:min(410px,88vw);background:#fffaf0;border:5px solid var(--line);border-radius:23px;box-shadow:0 16px 40px rgba(48,27,17,.35);padding:25px 20px 18px;text-align:center;opacity:0;pointer-events:none;transition:.2s}
+.toast.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.toastClose,.closeIntro{position:absolute;left:-13px;top:15px;width:34px;height:34px;border-radius:50%;background:#d85c50;color:#fff;border:3px solid var(--line);font-weight:900;font-size:19px;box-shadow:0 3px 0 #9f3d34}
+.toastEmoji{font-size:48px}.toast h3{margin:5px 0;font:800 25px "Baloo 2";color:#c64f42}.toast p{margin:4px 0 12px;font-weight:700;line-height:1.45}.toastAction{padding:9px 22px;background:#79a96c;color:white;border:3px solid #52794a;border-radius:14px;font-weight:900}
+
+/* INTRO */
+.overlay{position:fixed;inset:0;background:rgba(59,36,24,.42);z-index:200;display:flex;align-items:center;justify-content:center}
+.intro{width:min(520px,90vw);background:#fff6df;border:6px solid var(--line);border-radius:30px;box-shadow:0 20px 60px rgba(43,24,14,.35);padding:28px;text-align:center;position:relative}
+.intro .saigon{font-size:54px}.intro h1{font:800 36px "Baloo 2";color:#c84e42;margin:3px 0}.intro h2{font:800 24px "Baloo 2";margin:0 0 8px}.intro p{font-weight:700;line-height:1.5}.start{margin-top:10px;padding:13px 35px;background:#e96858;color:white;border:4px solid var(--line);border-radius:18px;font:800 20px "Baloo 2";box-shadow:0 6px 0 #a94035}
+
+/* MOBILE/SMALL */
+@media(max-width:900px){
+ .play{grid-template-columns:28% 44% 28%;gap:7px;left:10px;right:10px}
+ .sign .title{font-size:20px}.sign{padding:7px 18px}
+ .mainBtn{min-width:95px;padding:9px 10px;font-size:14px}
+ .pot{transform:scale(.78)}.ingredientGrid{gap:5px}.ingredient{min-height:65px}.ingredient .ico{font-size:25px}
+}
+@media(max-height:650px){.shop{top:1.5%;bottom:1.5%}.awning{height:60px}.sign{top:15px}.hud{top:72px}.play{top:125px}}
+</style>
+</head>
+<body>
+<div id="game">
+ <div class="sky">
+  <div class="cloud c1"></div><div class="cloud c2"></div>
+  <div class="city">
+   <div class="building b1"><i class="win"></i></div><div class="building b2"><i class="win"></i></div>
+   <div class="building b3"><i class="win"></i></div><div class="building b4"><i class="win"></i></div><div class="building b5"><i class="win"></i></div>
+   <div class="tree t1"></div><div class="tree t2"></div><div class="road"></div>
+  </div>
+ </div>
+
+ <div class="shop">
+  <div class="awning"></div>
+  <div class="sign"><div class="title">🍜 SÀI GÒN HÔM NAY ĂN GÌ?</div><div class="sub">QUÁN NHỎ • MÓN NGON • CHUYỆN VUI</div></div>
+
+  <div class="hud">
+   <div class="hudLeft">
+    <div class="pill">☀️ Ngày <span id="day">1</span></div>
+    <div class="pill">💰 <span id="money">100.000</span>đ</div>
+    <div class="pill">⭐ <span id="score">0</span></div>
+   </div>
+   <div class="hudRight"><button id="musicBtn">🔊 Nhạc</button><button id="resetBtn">↻ Chơi lại</button></div>
+  </div>
+
+  <div class="play">
+   <!-- KHÁCH -->
+   <section class="panel customer" id="customerPanel">
+    <div class="panelTitle">🧑 KHÁCH ĐANG ĐỢI</div>
+    <div class="orderCard"><b>📋 Đơn gọi món</b><div class="orderItems" id="orderText">Đang chờ khách...</div></div>
+
+    <div class="character charBounce" id="customerCharacter"></div>
+    <div class="customerSeat"></div>
+    <div class="eatBubble" id="eatBubble">😋 Ngon quá!</div>
+   </section>
+
+   <!-- BẾP -->
+   <section class="panel cook" id="cookPanel">
+    <div class="panelTitle">🥣 KHU BẾP CỦA BẠN</div>
+    <div class="kitchenBack"></div><div class="shelf"></div>
+    <div class="jar j1"></div><div class="jar j2"></div><div class="jar j3"></div><div class="jar j4"></div>
+    <div class="potZone">
+     <div class="pot" id="pot">
+      <div class="foodInside" id="foodInside"></div>
+      <div class="steam s1">♨</div><div class="steam s2">♨</div><div class="steam s3">♨</div>
+     </div>
+    </div>
+    <div class="dropHint" id="dropHint">Kéo nguyên liệu vào nồi 🥣</div>
+    <div class="cookButtons">
+     <button class="mainBtn green" id="cookBtn" disabled>🔥 NẤU MÓN</button>
+     <button class="mainBtn blue" id="serveBtn" disabled>🍽️ BƯNG RA</button>
+    </div>
+    <div class="progressWrap" id="progressWrap"><div class="progress" id="progress"></div></div>
+
+    <div class="servingTray" id="servingTray">
+      <div class="food" id="serveFood">🍜🥩🥬</div>
+      <div class="bowl"></div><div class="tray"></div>
+    </div>
+   </section>
+
+   <!-- NGUYÊN LIỆU -->
+   <section class="panel ingredients">
+    <div class="panelTitle">🛒 NGUYÊN LIỆU</div>
+    <div class="ingredientGrid" id="ingredientGrid"></div>
+    <div class="tip">💡 Kéo thật nhẹ nguyên liệu vào nồi. Đúng món sẽ tự vào tô!</div>
+   </section>
+  </div>
+ </div>
+</div>
+
+<div class="toast" id="toast">
+ <button class="toastClose" id="toastClose">×</button>
+ <div class="toastEmoji" id="toastEmoji">😊</div>
+ <h3 id="toastTitle">Thông báo</h3>
+ <p id="toastText"></p>
+ <button class="toastAction" id="toastAction">Được rồi</button>
+</div>
+
+<div class="overlay" id="intro">
+ <div class="intro">
+  <button class="closeIntro" id="introClose">×</button>
+  <div class="saigon">🏮🍜🏮</div>
+  <h1>Sài Gòn hôm nay ăn gì?</h1>
+  <h2>Ngày <span id="introDay">1</span> — Quán mở cửa!</h2>
+  <p>Khách đã đến rồi! Xem khách gọi món gì, kéo đúng nguyên liệu vào nồi, nấu chín, rồi <b>bưng tô ra tận tay khách</b> nhé! 🌷</p>
+  <button class="start" id="startBtn">MỞ CỬA QUÁN ✨</button>
+ </div>
+</div>
+
+<script>
+const RECIPES={
+ "Cơm sườn":{icon:"🍚",ingredients:[["Cơm","🍚"],["Sườn","🥩"],["Rau","🥬"],["Gia vị","🧂"]]},
+ "Bánh mì":{icon:"🥖",ingredients:[["Bánh mì","🥖"],["Thịt","🥩"],["Rau","🥬"],["Đồ chua","🥒"]]},
+ "Bánh hỏi heo quay":{icon:"🍜",ingredients:[["Bánh hỏi","🍜"],["Heo quay","🍖"],["Rau","🥬"],["Gia vị","🧂"]]},
+ "Bún thịt nướng":{icon:"🍜",ingredients:[["Bún","🍜"],["Thịt nướng","🍖"],["Rau","🥬"],["Đồ chua","🥒"]]},
+ "Bún bò":{icon:"🍲",ingredients:[["Bún","🍜"],["Thịt bò","🥩"],["Rau","🥬"],["Gia vị","🧂"]]},
+ "Bún riêu":{icon:"🍲",ingredients:[["Bún","🍜"],["Cua","🦀"],["Cà chua","🍅"],["Trứng","🥚"],["Rau","🥬"]]}
+};
+const allIngredients=[
+ ["Cơm","🍚"],["Sườn","🥩"],["Rau","🥬"],["Gia vị","🧂"],["Bánh mì","🥖"],["Thịt","🥩"],["Đồ chua","🥒"],
+ ["Bánh hỏi","🍜"],["Heo quay","🍖"],["Bún","🍜"],["Thịt nướng","🍖"],["Thịt bò","🥩"],["Cua","🦀"],["Cà chua","🍅"],["Trứng","🥚"]
+];
+
+let state={day:1,money:100000,score:0,served:0,current:null,added:[],cooked:false,music:true};
+try{const s=JSON.parse(localStorage.getItem("saigonFoodGameV4"));if(s)state={...state,...s}}catch(e){}
+const $=id=>document.getElementById(id);
+const moneyFmt=n=>n.toLocaleString("vi-VN");
+
+function save(){localStorage.setItem("saigonFoodGameV4",JSON.stringify(state))}
+function updateHUD(){
+ $("day").textContent=state.day;$("introDay").textContent=state.day;
+ $("money").textContent=moneyFmt(state.money);$("score").textContent=state.score
+}
+
+function customerSVG(type){
+ const people={
+  girl:{skin:"#f3b983",hair:"#3d302b",shirt:"#e98f8a",bottom:"#f1d4a4",hair2:"#4c3830",accessory:"#fff0d0"},
+  boy:{skin:"#d99561",hair:"#3d302b",shirt:"#6da2a0",bottom:"#e8c98e",hair2:"#46342d",accessory:"#f0d49c"},
+  aunt:{skin:"#e7aa79",hair:"#40312d",shirt:"#d66b61",bottom:"#e8b878",hair2:"#40312d",accessory:"#f4dfae"},
+  uncle:{skin:"#c98958",hair:"#40302b",shirt:"#7d9f7d",bottom:"#d7b87c",hair2:"#40302b",accessory:"#f0d8a9"}
+ };
+ const p=people[type];
+ return `<svg viewBox="0 0 220 330">
+ <ellipse cx="110" cy="315" rx="64" ry="10" fill="#9b6849" opacity=".28"/>
+ <path d="M55 190 Q110 158 165 190 L174 286 Q110 308 46 286Z" fill="${p.shirt}" stroke="#684836" stroke-width="5"/>
+ <path d="M71 196 Q110 216 149 196 L143 287 Q110 300 77 287Z" fill="${p.bottom}" stroke="#684836" stroke-width="4"/>
+ <circle cx="110" cy="115" r="68" fill="${p.skin}" stroke="#684836" stroke-width="5"/>
+ <path d="M43 117 Q35 42 111 39 Q185 42 174 119 Q157 76 123 75 Q76 72 43 117Z" fill="${p.hair}" stroke="#684836" stroke-width="5"/>
+ ${type==="girl"?`<path d="M44 101 Q30 120 45 150 M176 101 Q191 120 175 150" fill="none" stroke="${p.hair}" stroke-width="17" stroke-linecap="round"/>`:""}
+ ${type==="aunt"?`<path d="M54 77 Q109 34 165 77" fill="none" stroke="${p.hair2}" stroke-width="13" stroke-linecap="round"/>`:""}
+ ${type==="uncle"?`<path d="M56 73 Q109 42 164 73" fill="none" stroke="${p.hair2}" stroke-width="8" stroke-linecap="round"/>`:""}
+ <circle cx="84" cy="122" r="6" fill="#3b2d29"/><circle cx="136" cy="122" r="6" fill="#3b2d29"/>
+ <circle cx="71" cy="143" r="10" fill="#ec8b7d" opacity=".42"/><circle cx="149" cy="143" r="10" fill="#ec8b7d" opacity=".42"/>
+ <path d="M94 151 Q110 165 126 151" fill="none" stroke="#70433a" stroke-width="4" stroke-linecap="round"/>
+ <path d="M50 201 Q25 226 32 260" fill="none" stroke="${p.skin}" stroke-width="20" stroke-linecap="round"/>
+ <path d="M170 201 Q195 226 188 260" fill="none" stroke="${p.skin}" stroke-width="20" stroke-linecap="round"/>
+ <circle cx="31" cy="262" r="13" fill="${p.skin}" stroke="#684836" stroke-width="4"/><circle cx="189" cy="262" r="13" fill="${p.skin}" stroke="#684836" stroke-width="4"/>
+ <path d="M83 286 L73 313 M137 286 L147 313" stroke="#684836" stroke-width="13" stroke-linecap="round"/>
+ <path d="M75 54 Q110 18 146 54" fill="none" stroke="${p.accessory}" stroke-width="9" stroke-linecap="round"/>
+ </svg>`
+}
+
+const customerTypes=["girl","boy","aunt","uncle"];
+let customerTypeIndex=0;
+
+function chooseRecipe(){
+ state.current=Object.keys(RECIPES)[Math.floor(Math.random()*Object.keys(RECIPES).length)];
+ state.added=[];state.cooked=false;
+ const r=RECIPES[state.current];
+ $("orderText").innerHTML=`<strong>${r.icon} ${state.current}</strong><br>Gồm ${r.ingredients.map(x=>x[0]).join(" • ")}`;
+ $("foodInside").innerHTML="";$("cookBtn").disabled=true;$("serveBtn").disabled=true;
+ $("progressWrap").style.display="none";$("progress").style.width="0%";$("dropHint").style.display="block";
+ customerTypeIndex=(customerTypeIndex+1)%customerTypes.length;
+ $("customerCharacter").innerHTML=customerSVG(customerTypes[customerTypeIndex]);
+ $("customerCharacter").classList.remove("customerEating");
+ $("eatBubble").classList.remove("show");
+}
+
+function renderIngredients(){
+ $("ingredientGrid").innerHTML="";
+ allIngredients.forEach(([name,ico])=>{
+  const b=document.createElement("button");b.className="ingredient";b.draggable=true;b.dataset.name=name;
+  b.innerHTML=`<div class="ico">${ico}</div><span>${name}</span>`;
+  b.addEventListener("dragstart",e=>{e.dataTransfer.effectAllowed="copy";e.dataTransfer.setData("text/plain",name);b.classList.add("dragging")});
+  b.addEventListener("dragend",()=>b.classList.remove("dragging"));
+  // smooth pointer drag
+  b.addEventListener("pointerdown",e=>{
+   if(e.button!==0)return;
+   const rect=b.getBoundingClientRect();const ox=e.clientX-rect.left,oy=e.clientY-rect.top;
+   let moved=false,ghost=null;
+   const move=ev=>{
+    if(Math.hypot(ev.clientX-e.clientX,ev.clientY-e.clientY)>5){
+      moved=true;
+      if(!ghost){
+       ghost=b.cloneNode(true);ghost.style.position="fixed";ghost.style.width=rect.width+"px";ghost.style.height=rect.height+"px";
+       ghost.style.left=(ev.clientX-ox)+"px";ghost.style.top=(ev.clientY-oy)+"px";ghost.style.zIndex=9999;
+       ghost.style.pointerEvents="none";ghost.style.transform="scale(.94) rotate(-2deg)";ghost.style.opacity=".92";
+       document.body.appendChild(ghost);b.style.opacity=".25";
+      }else{ghost.style.left=(ev.clientX-ox)+"px";ghost.style.top=(ev.clientY-oy)+"px"}
+      const pr=$("pot").getBoundingClientRect();
+      $("cookPanel").classList.toggle("dragOver",ev.clientX>pr.left-35&&ev.clientX<pr.right+35&&ev.clientY>pr.top-35&&ev.clientY<pr.bottom+35);
+    }
+   };
+   const up=ev=>{
+    document.removeEventListener("pointermove",move);document.removeEventListener("pointerup",up);
+    $("cookPanel").classList.remove("dragOver");b.style.opacity="";
+    if(ghost)ghost.remove();
+    if(moved){
+      const pr=$("pot").getBoundingClientRect();
+      if(ev.clientX>pr.left-35&&ev.clientX<pr.right+35&&ev.clientY>pr.top-35&&ev.clientY<pr.bottom+35)addIngredient(name);
+    }
+   };
+   document.addEventListener("pointermove",move,{passive:true});document.addEventListener("pointerup",up,{once:true});
+  });
+  $("ingredientGrid").appendChild(b);
+ });
+}
+
+function addIngredient(name){
+ if(!state.current||state.cooked||state.added.includes(name))return;
+ const recipe=RECIPES[state.current].ingredients.map(x=>x[0]);
+ if(!recipe.includes(name)){
+  showToast("❌","Chưa đúng nguyên liệu","Món <b>"+state.current+"</b> không cần <b>"+name+"</b>. Hãy thử món khác nhé!","TIẾP TỤC");
+  beep(180,.16,"sawtooth");return;
+ }
+ state.added.push(name);
+ const item=allIngredients.find(x=>x[0]===name),dot=document.createElement("span");
+ dot.className="foodDot";dot.textContent=item[1];$("foodInside").appendChild(dot);beep(560,.09,"sine");
+ if(state.added.length===recipe.length){$("cookBtn").disabled=false;$("dropHint").textContent="Đủ nguyên liệu rồi! 🔥"}
+}
+
+$("cookPanel").addEventListener("dragover",e=>e.preventDefault());
+$("cookPanel").addEventListener("drop",e=>{e.preventDefault();const n=e.dataTransfer.getData("text/plain");if(n)addIngredient(n)});
+
+function cook(){
+ if($("cookBtn").disabled)return;
+ $("cookBtn").disabled=true;$("progressWrap").style.display="block";$("dropHint").style.display="none";
+ $("pot").classList.add("cooking");let p=0;
+ const timer=setInterval(()=>{
+  p+=2;$("progress").style.width=p+"%";if(p%10===0)beep(260+p*2,.05,"triangle");
+  if(p>=100){clearInterval(timer);$("pot").classList.remove("cooking");state.cooked=true;$("serveBtn").disabled=false;
+   showToast("🍳","Món ăn đã chín!","Món <b>"+state.current+"</b> thơm phức rồi. Bây giờ hãy <b>bưng tô ra cho khách</b> nhé!","BƯNG TÔ RA");}
+ },55)
+}
+$("cookBtn").onclick=cook;
+
+function serve(){
+ if(!state.cooked)return;
+ closeToast();
+ const tray=$("servingTray");$("serveFood").textContent=RECIPES[state.current].icon+"🍖🥬";
+ tray.classList.remove("show");void tray.offsetWidth;tray.classList.add("show");
+ $("serveBtn").disabled=true;$("cookBtn").disabled=true;
+ beep(620,.1,"sine");setTimeout(()=>beep(760,.12,"sine"),170);
+ setTimeout(customerEat,1550);
+}
+$("serveBtn").onclick=serve;
+
+function customerEat(){
+ const ch=$("customerCharacter"),bubble=$("eatBubble");
+ ch.classList.add("customerEating");bubble.textContent="😋 Ăn ngon quá!";bubble.classList.add("show");
+ // little eating sounds
+ [0,220,440].forEach(t=>setTimeout(()=>beep(520+t/4,.12,"sine"),t));
+ setTimeout(()=>{
+  ch.classList.remove("customerEating");
+  const reactions=[
+   ["😍","NGON QUÁ!","Khách ăn một miếng rồi mắt sáng lên: “Đúng vị Sài Gòn luôn!”"],
+   ["😋","RẤT NGON!","Khách ăn sạch veo và gật gù khen món của quán."],
+   ["🥰","TUYỆT VỜI!","Khách cười thật tươi: “Mai tôi lại ghé quán nhé!”"],
+   ["😆","LẠ MÀ NGON!","Khách bất ngờ rồi bật cười: “Món này thú vị ghê!”"]
+  ];
+  const r=reactions[Math.floor(Math.random()*reactions.length)];
+  const bonus=RECIPES[state.current].ingredients.length===5?35000:25000;
+  state.money+=bonus;state.score+=10;state.served++;
+  bubble.classList.remove("show");
+  showToast(r[0],r[1],r[2]+`<br><b>⭐ +10 điểm &nbsp; 💰 +${moneyFmt(bonus)}đ</b>`,"ĐÓN KHÁCH TIẾP THEO");
+  save();updateHUD();
+ },1900)
+}
+
+function nextCustomer(){
+ $("servingTray").classList.remove("show");
+ if(state.served>0&&state.served%5===0){
+  state.day++;updateHUD();
+  showToast("🌞","BẮT ĐẦU NGÀY "+state.day,"Quán hôm nay đông vui quá! Hãy tiếp tục phục vụ những vị khách Sài Gòn đáng yêu nhé! 🏮","MỞ QUÁN");
+ }else chooseRecipe();
+ save();
+}
+
+function showToast(emoji,title,text,action){$("toastEmoji").textContent=emoji;$("toastTitle").textContent=title;$("toastText").innerHTML=text;$("toastAction").textContent=action;$("toast").classList.add("show")}
+function closeToast(){$("toast").classList.remove("show")}
+$("toastClose").onclick=closeToast;
+$("toastAction").onclick=()=>{const a=$("toastAction").textContent;closeToast();if(a==="BƯNG TÔ RA")serve();else if(a==="ĐÓN KHÁCH TIẾP THEO"||a==="MỞ QUÁN")nextCustomer()};
+
+let audioCtx=null;
+function beep(freq,duration,type="sine"){
+ if(!state.music)return;
+ try{
+  audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==="suspended")audioCtx.resume();
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(.0001,audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(.12,audioCtx.currentTime+.015);
+  g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+duration);
+  o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+duration+.03)
+ }catch(e){}
+}
+function melody(){
+ if(!state.music)return;
+ const notes=[523,659,784,659,587,698,880,784,659,784,988,784];
+ notes.forEach((n,i)=>setTimeout(()=>beep(n,.16,"sine"),i*135));
+}
+$("musicBtn").onclick=()=>{
+ state.music=!state.music;$("musicBtn").textContent=state.music?"🔊 Nhạc":"🔇 Nhạc";
+ if(state.music){if(!audioCtx)melody();else {try{audioCtx.resume()}catch(e){}melody()}}save()
+};
+$("startBtn").onclick=()=>{$("intro").style.display="none";melody();chooseRecipe()};
+$("introClose").onclick=()=>{$("intro").style.display="none";melody();chooseRecipe()};
+$("resetBtn").onclick=()=>{
+ localStorage.removeItem("saigonFoodGameV4");
+ state={day:1,money:100000,score:0,served:0,current:null,added:[],cooked:false,music:true};
+ updateHUD();$("intro").style.display="flex";
+};
+
+renderIngredients();updateHUD();
+</script>
+</body>
+</html>
